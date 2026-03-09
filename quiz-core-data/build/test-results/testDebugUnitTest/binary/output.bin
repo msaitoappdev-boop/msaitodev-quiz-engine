@@ -1,0 +1,9 @@
+Encryption started...
+qSource: C:\Users\msait\AndroidStudioProjects\caregiver-humanmed-starter\quiz-core-data\..\master_data\quiz_data
+~Destination: C:\Users\msait\AndroidStudioProjects\caregiver-humanmed-starter\quiz-core-data\..\app\src\main\assets\quiz_data
+3Encrypting: questions_01.json -> questions_01.bin
+3Encrypting: questions_01.json -> questions_01.bin
+3Encrypting: questions_01.json -> questions_01.bin
+3Encrypting: questions_01.json -> questions_01.bin
+3Encrypting: questions_01.json -> questions_01.bin
+$Encryption completed successfully.

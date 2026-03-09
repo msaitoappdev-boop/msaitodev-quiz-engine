@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.msaitodev.quiz.core.domain.usecase.GetDailyQuestionsUseCaseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-03-05T04:26:49" hostname="VICTUS_MS" time="1.05">
+  <properties/>
+  <testcase name="invoke - loads all questions and selects from them" classname="com.msaitodev.quiz.core.domain.usecase.GetDailyQuestionsUseCaseTest" time="1.05"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
