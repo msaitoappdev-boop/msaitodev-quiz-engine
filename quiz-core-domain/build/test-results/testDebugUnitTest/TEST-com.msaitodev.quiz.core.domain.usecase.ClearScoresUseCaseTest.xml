@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.msaitodev.quiz.core.domain.usecase.ClearScoresUseCaseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-03-05T04:26:49" hostname="VICTUS_MS" time="0.151">
-  <properties/>
-  <testcase name="invoke calls repository clear" classname="com.msaitodev.quiz.core.domain.usecase.ClearScoresUseCaseTest" time="0.151"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
