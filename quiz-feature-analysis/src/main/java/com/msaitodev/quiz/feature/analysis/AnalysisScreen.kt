@@ -553,11 +553,7 @@ private fun CategoryItem(
     onClick: () -> Unit
 ) {
     val percentageFormat = stringResource(R.string.analysis_percentage_format)
-    val progressColor = if (summary.accuracyRate > 0.7f) {
-        Color(0xFF4CAF50) // Success color
-    } else {
-        MaterialTheme.colorScheme.primary
-    }
+    val progressColor = MaterialTheme.colorScheme.primary
 
     Column(
         modifier = Modifier
