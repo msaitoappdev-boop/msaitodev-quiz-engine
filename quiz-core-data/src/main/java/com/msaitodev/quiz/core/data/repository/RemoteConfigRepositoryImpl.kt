@@ -17,4 +17,12 @@ class RemoteConfigRepositoryImpl @Inject constructor(
     override fun getBoolean(key: String): Boolean {
         return cloudConfigClient.getBoolean(key)
     }
+
+    override fun getString(key: String): String {
+        return cloudConfigClient.getString(key)
+    }
+
+    override suspend fun fetch(): Boolean {
+        return cloudConfigClient.fetchAndActivate() // CloudConfigClientにも同様のメソッドを追加
+    }
 }

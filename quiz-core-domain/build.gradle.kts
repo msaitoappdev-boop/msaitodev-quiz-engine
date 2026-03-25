@@ -46,7 +46,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-core-domain"
-                version = "1.0.0"
+                version = "1.1.1"
                 from(components["release"])
             }
         }
