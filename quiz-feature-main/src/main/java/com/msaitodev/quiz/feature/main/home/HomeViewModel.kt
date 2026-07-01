@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msaitodev.core.ads.RewardedHelper
+import com.msaitodev.core.common.config.AppAssetConfig
 import com.msaitodev.core.notifications.ReminderRepository
 import com.msaitodev.feature.settings.SettingsProvider
 import com.msaitodev.quiz.core.domain.config.RemoteConfigKeys
+import com.msaitodev.quiz.core.domain.model.LearningAnalysis
 import com.msaitodev.quiz.core.domain.model.QuotaState
 import com.msaitodev.quiz.core.domain.model.TrendPeriod
 import com.msaitodev.quiz.core.domain.repository.PremiumRepository
@@ -25,7 +27,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -58,7 +59,8 @@ class HomeViewModel @Inject constructor(
     private val remoteConfigRepo: RemoteConfigRepository,
     private val startNextQuiz: StartNextQuizUseCase,
     private val reminderRepo: ReminderRepository,
-    private val getLearningAnalysis: GetLearningAnalysisUseCase
+    private val getLearningAnalysis: GetLearningAnalysisUseCase,
+    private val appAssetConfig: AppAssetConfig
 ) : ViewModel() {
 
     private val isPremium: StateFlow<Boolean> = premiumRepo.isPremium
@@ -69,10 +71,9 @@ class HomeViewModel @Inject constructor(
     // 追加: RemoteConfig から取得した情報を管理する StateFlow
     private val _appSpecificInfo = MutableStateFlow<Map<String, Any>>(emptyMap())
 
-    // 連続学習日数を取得するための Flow
-    private val streakFlow: StateFlow<Int> = getLearningAnalysis(TrendPeriod.DAILY)
-        .map { it.currentStreak }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+    // 学習分析データを取得するための Flow
+    private val analysisFlow: StateFlow<LearningAnalysis?> = getLearningAnalysis(TrendPeriod.DAILY)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     init {
         viewModelScope.launch {
@@ -87,16 +88,20 @@ class HomeViewModel @Inject constructor(
         val info = mutableMapOf<String, Any>()
 
         // 次回試験日の取得と整形
+        // キー名を exam_date_[パッケージ名の_変換] に変更
         val examDateKey = "exam_date_${packageName.replace('.', '_')}"
         val rawDate = remoteConfigRepo.getString(examDateKey)
         if (rawDate.length == 8) {
             try {
+                // YYYYMMDD をパース
                 val sdf = SimpleDateFormat("yyyyMMdd", Locale.US)
                 val date = sdf.parse(rawDate)
                 if (date != null) {
+                    // 1. フォーマット済み日付
                     val formatted = SimpleDateFormat("yyyy年MM月dd日（E）", Locale.JAPANESE).format(date)
                     info["exam_date"] = formatted
 
+                    // 2. 残り日数の計算
                     val today = Calendar.getInstance().apply {
                         set(Calendar.HOUR_OF_DAY, 0)
                         set(Calendar.MINUTE, 0)
@@ -125,6 +130,12 @@ class HomeViewModel @Inject constructor(
         quotaRepo.observe { limit }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    enum class PredictedScoreStatus {
+        NOT_ATTEMPTED,
+        BELOW_PASSING,
+        PASSING
+    }
+
     data class HomeUiState(
         val canStart: Boolean = false,
         val isLoading: Boolean = false,
@@ -132,36 +143,37 @@ class HomeViewModel @Inject constructor(
         val showReminderInvitation: Boolean = false,
         val examDateText: String? = null,
         val remainingDays: Int? = null,
-        val streakDays: Int = 0
+        val streakDays: Int = 0,
+        val scoreStatus: PredictedScoreStatus = PredictedScoreStatus.NOT_ATTEMPTED
     )
 
-    // Flowを結合してUiStateを作成 (型の推論を助けるために Array を使用)
+    // Flowを結合してUiStateを作成
+    // combine の多引数制限と型推論の問題を避けるため、入れ子にして結合
     val uiState: StateFlow<HomeUiState> = combine(
-        quotaFlow,
-        isPremium,
-        reminderRepo.isReminderEnabled,
-        _isReminderInvitationDismissed,
-        _appSpecificInfo,
-        streakFlow
-    ) { args: Array<Any?> ->
-        val quota = args[0] as? QuotaState
-        val isPremiumValue = args[1] as Boolean
-        val isReminderEnabled = args[2] as Boolean
-        val isDismissed = args[3] as Boolean
-        @Suppress("UNCHECKED_CAST")
-        val appInfo = args[4] as Map<String, Any>
-        val streak = args[5] as Int
+        combine(quotaFlow, isPremium, reminderRepo.isReminderEnabled) { q, p, r -> Triple(q, p, r) },
+        combine(_isReminderInvitationDismissed, _appSpecificInfo, analysisFlow) { d, i, a -> Triple(d, i, a) }
+    ) { t1, t2 ->
+        val (quota, isPremiumValue, isReminderEnabled) = t1
+        val (isDismissed, appInfo, analysis) = t2
 
         if (quota == null) {
             HomeUiState(isLoading = true)
         } else {
+            // 推定スコアのステータス判定
+            val status = when {
+                analysis == null || analysis.totalProgress == 0f -> PredictedScoreStatus.NOT_ATTEMPTED
+                analysis.predictedScore >= (analysis.totalExamQuestions * appAssetConfig.passingScoreThreshold) -> PredictedScoreStatus.PASSING
+                else -> PredictedScoreStatus.BELOW_PASSING
+            }
+
             HomeUiState(
                 canStart = quota.canStart,
                 isPremium = isPremiumValue,
                 showReminderInvitation = !isReminderEnabled && !isDismissed,
                 examDateText = appInfo["exam_date"] as? String,
                 remainingDays = appInfo["remaining_days"] as? Int,
-                streakDays = streak
+                streakDays = analysis?.currentStreak ?: 0,
+                scoreStatus = status
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
@@ -192,6 +204,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 学習分析ボタンがクリックされた時の処理。
+     */
     fun onAnalysisClicked() {
         viewModelScope.launch {
             if (uiState.value.isPremium) {

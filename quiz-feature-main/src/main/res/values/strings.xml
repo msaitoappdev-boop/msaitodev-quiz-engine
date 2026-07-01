@@ -10,6 +10,13 @@
     <string name="home_remaining_days">残り %1$d 日！</string>
     <string name="home_streak_format">現在 %1$d 日連続学習中！ 🔥</string>
 
+    <string name="home_status_title">現在の学習状況</string>
+    <string name="home_predicted_score_label">本試験推定ランク：</string>
+    <string name="home_score_not_attempted">未実施</string>
+    <string name="home_score_below_passing">合格ラインまであと一歩</string>
+    <string name="home_score_passing">合格ライン到達！</string>
+    <string name="home_score_detail_note">※詳細は「学習分析」画面で確認できます</string>
+
     <!-- Quiz -->
     <string name="quiz_question_format">第 %1$d 問 / 全 %2$d 問</string>
     <string name="quiz_mode_daily">デイリー学習</string>

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -56,9 +57,7 @@ internal fun HomeScreen(
     onUpgrade: () -> Unit,
     onOpenSettings: () -> Unit,
     onOfferConfirm: () -> Unit,
-    onOfferDismiss: () -> Unit,
-    onReminderInvitationDismiss: () -> Unit,
-    onReminderInvitationClick: () -> Unit
+    onOfferDismiss: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -91,15 +90,6 @@ internal fun HomeScreen(
                 .padding(bottom = 24.dp)
                 .fillMaxSize()
         ) {
-            // リマインド誘導カード
-            if (uiState.showReminderInvitation) {
-                ReminderInvitationCard(
-                    onDismiss = onReminderInvitationDismiss,
-                    onClick = onReminderInvitationClick
-                )
-                Spacer(Modifier.height(24.dp))
-            }
-
             // メインアクション: 通常のクイズ
             Button(
                 onClick = onStartQuiz,
@@ -172,20 +162,20 @@ internal fun HomeScreen(
                 }
             }
 
-            // 次回試験日の表示 (ブラッシュアップ版)
+            // カード1: 次回試験日の表示 (取得できた場合のみ)
             uiState.examDateText?.let { dateText ->
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(24.dp))
                 OutlinedCard(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.outlinedCardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.05f)
                     ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(12.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -194,37 +184,98 @@ internal fun HomeScreen(
                                 Icons.Default.Event,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(14.dp)
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = stringResource(R.string.home_next_exam_date, dateText),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                         
                         uiState.remainingDays?.let { days ->
-                            Spacer(Modifier.height(8.dp))
+                            Spacer(Modifier.height(4.dp))
                             Text(
                                 text = stringResource(R.string.home_remaining_days, days),
-                                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 32.sp),
+                                style = MaterialTheme.typography.headlineMedium.copy(fontSize = 28.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Black
                             )
                         }
+                    }
+                }
+            }
 
-                        // 連続学習日数の表示
+            // カード2: 現在の学習状況 (推定ランク + ストリーク)
+            if (!uiState.isLoading) {
+                Spacer(Modifier.height(16.dp))
+                OutlinedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.outlinedCardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.05f)
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_status_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        
+                        Spacer(Modifier.height(12.dp))
+
+                        // 推定ランク
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.home_predicted_score_label),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = when (uiState.scoreStatus) {
+                                    HomeViewModel.PredictedScoreStatus.NOT_ATTEMPTED -> stringResource(R.string.home_score_not_attempted)
+                                    HomeViewModel.PredictedScoreStatus.BELOW_PASSING -> stringResource(R.string.home_score_below_passing)
+                                    HomeViewModel.PredictedScoreStatus.PASSING -> stringResource(R.string.home_score_passing)
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (uiState.scoreStatus == HomeViewModel.PredictedScoreStatus.PASSING) 
+                                    MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                            )
+                        }
+
+                        // ストリーク
                         if (uiState.streakDays > 0) {
-                            Spacer(Modifier.height(12.dp))
+                            Spacer(Modifier.height(8.dp))
                             Text(
                                 text = stringResource(R.string.home_streak_format, uiState.streakDays),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.ExtraBold
                             )
                         }
+
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.home_score_detail_note),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
@@ -243,66 +294,5 @@ internal fun HomeScreen(
                 TextButton(onClick = onOfferDismiss) { Text(stringResource(R.string.dialog_rewarded_ad_dismiss)) }
             }
         )
-    }
-}
-
-@Composable
-private fun ReminderInvitationCard(
-    onDismiss: () -> Unit,
-    onClick: () -> Unit
-) {
-    OutlinedCard(
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                    Icon(
-                        imageVector = Icons.Default.NotificationsActive,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = stringResource(R.string.home_reminder_invitation_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.home_reminder_invitation_dismiss),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-            
-            Spacer(Modifier.height(8.dp))
-            
-            Text(
-                text = stringResource(R.string.home_reminder_invitation_message),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            
-            Spacer(Modifier.height(16.dp))
-            
-            Button(
-                onClick = onClick,
-                modifier = Modifier.align(Alignment.End),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(stringResource(R.string.home_reminder_invitation_action))
-            }
-        }
     }
 }

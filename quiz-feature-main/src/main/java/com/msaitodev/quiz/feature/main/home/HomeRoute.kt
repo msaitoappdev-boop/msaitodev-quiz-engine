@@ -87,12 +87,6 @@ fun HomeRoute(
                 }
             }
         },
-        onOfferDismiss = { showOfferDialog = false },
-        onReminderInvitationDismiss = {
-            viewModel.onReminderInvitationDismissed()
-        },
-        onReminderInvitationClick = {
-            viewModel.onReminderInvitationClicked()
-        }
+        onOfferDismiss = { showOfferDialog = false }
     )
 }
