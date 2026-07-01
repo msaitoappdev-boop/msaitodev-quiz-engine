@@ -55,7 +55,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-feature-main"
-                version = "1.0.0"
+                version = "1.1.0"
                 from(components["release"])
             }
         }
@@ -70,7 +70,7 @@ dependencies {
     implementation("com.msaitodev.core:core-navigation:1.0.0")
     implementation("com.msaitodev.core:core-cloud-sync:1.0.0")
     implementation("com.msaitodev.feature:feature-settings:1.0.0")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.0.0")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.1")
     implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.0")
 
     implementation("androidx.core:core-ktx:1.13.1")
