@@ -1,7 +1,6 @@
 package com.msaitodev.quiz.feature.main.home
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,11 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
@@ -86,8 +84,7 @@ internal fun HomeScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp)
+                .padding(horizontal = 20.dp)
                 .fillMaxSize()
         ) {
             // メインアクション: 通常のクイズ
@@ -99,7 +96,7 @@ internal fun HomeScreen(
                 Text(stringResource(R.string.home_start_quiz))
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
 
             // 弱点特訓
             OutlinedButton(
@@ -111,11 +108,6 @@ internal fun HomeScreen(
                     Icon(Icons.Default.Psychology, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.home_weakness_training))
-                    Text(
-                        text = stringResource(R.string.home_premium_label),
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
                     if (!uiState.isPremium) {
                         Spacer(Modifier.width(8.dp))
                         Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -123,7 +115,7 @@ internal fun HomeScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
 
             // 学習分析
             OutlinedButton(
@@ -136,20 +128,15 @@ internal fun HomeScreen(
                     Spacer(Modifier.width(8.dp))
                     Text("学習分析")
                     if (!uiState.isPremium) {
-                        Text(
-                            text = stringResource(R.string.home_premium_label),
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
                         Spacer(Modifier.width(8.dp))
                         Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(14.dp))
                     }
                 }
             }
 
-            // スコア履歴 (無料ユーザーのみ表示)
+            // スコア履歴 (無料ユーザーのみ)
             if (!uiState.isPremium) {
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = onViewHistory,
                     modifier = Modifier.fillMaxWidth()
@@ -162,43 +149,37 @@ internal fun HomeScreen(
                 }
             }
 
-            // カード1: 次回試験日の表示 (取得できた場合のみ)
+            // カード1: 試験日
             uiState.examDateText?.let { dateText ->
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(16.dp))
                 OutlinedCard(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.outlinedCardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.05f)
                     ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(12.dp)
+                            .padding(8.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.Event,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(Modifier.width(8.dp))
+                            Icon(Icons.Default.Event, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
+                            Spacer(Modifier.width(6.dp))
                             Text(
                                 text = stringResource(R.string.home_next_exam_date, dateText),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
                         
                         uiState.remainingDays?.let { days ->
-                            Spacer(Modifier.height(4.dp))
                             Text(
                                 text = stringResource(R.string.home_remaining_days, days),
-                                style = MaterialTheme.typography.headlineMedium.copy(fontSize = 28.sp),
+                                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Black
                             )
@@ -207,41 +188,47 @@ internal fun HomeScreen(
                 }
             }
 
-            // カード2: 現在の学習状況 (推定ランク + ストリーク)
+            // カード2: 学習状況 (苦手分野のインサイトを統合)
             if (!uiState.isLoading) {
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
                 OutlinedCard(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.outlinedCardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.05f)
                     ),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    onClick = onAnalysisClicked
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = stringResource(R.string.home_status_title),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = stringResource(R.string.home_status_title),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            if (!uiState.isPremium) {
+                                Spacer(Modifier.width(8.dp))
+                                Icon(
+                                    Icons.Default.Lock,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                         
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(8.dp))
 
                         // 推定ランク
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(Modifier.width(8.dp))
+                            Icon(Icons.Default.Star, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(6.dp))
                             Text(
                                 text = stringResource(R.string.home_predicted_score_label),
                                 style = MaterialTheme.typography.bodySmall
@@ -252,7 +239,7 @@ internal fun HomeScreen(
                                     HomeViewModel.PredictedScoreStatus.BELOW_PASSING -> stringResource(R.string.home_score_below_passing)
                                     HomeViewModel.PredictedScoreStatus.PASSING -> stringResource(R.string.home_score_passing)
                                 },
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Bold,
                                 color = if (uiState.scoreStatus == HomeViewModel.PredictedScoreStatus.PASSING) 
                                     MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
@@ -261,7 +248,7 @@ internal fun HomeScreen(
 
                         // ストリーク
                         if (uiState.streakDays > 0) {
-                            Spacer(Modifier.height(8.dp))
+                            Spacer(Modifier.height(4.dp))
                             Text(
                                 text = stringResource(R.string.home_streak_format, uiState.streakDays),
                                 style = MaterialTheme.typography.titleMedium,
@@ -270,10 +257,33 @@ internal fun HomeScreen(
                             )
                         }
 
+                        // 統合: 苦手分野のアドバイス
+                        uiState.weakestCategoryName?.let { category ->
+                            Spacer(Modifier.height(8.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.AutoAwesome,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.home_weakness_pickup_message, category),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+
                         Spacer(Modifier.height(8.dp))
                         Text(
                             text = stringResource(R.string.home_score_detail_note),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

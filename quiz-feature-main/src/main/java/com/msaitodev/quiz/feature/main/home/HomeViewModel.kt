@@ -64,20 +64,14 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val isPremium: StateFlow<Boolean> = premiumRepo.isPremium
-
-    // ユーザーがそのセッションで誘導を閉じたかどうかを管理
     private val _isReminderInvitationDismissed = MutableStateFlow(false)
-
-    // 追加: RemoteConfig から取得した情報を管理する StateFlow
     private val _appSpecificInfo = MutableStateFlow<Map<String, Any>>(emptyMap())
 
-    // 学習分析データを取得するための Flow
     private val analysisFlow: StateFlow<LearningAnalysis?> = getLearningAnalysis(TrendPeriod.DAILY)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     init {
         viewModelScope.launch {
-            // Remote Config を最新化
             remoteConfigRepo.fetch()
             updateAppSpecificInfo()
         }
@@ -86,22 +80,15 @@ class HomeViewModel @Inject constructor(
     private fun updateAppSpecificInfo() {
         val packageName = context.packageName
         val info = mutableMapOf<String, Any>()
-
-        // 次回試験日の取得と整形
-        // キー名を exam_date_[パッケージ名の_変換] に変更
         val examDateKey = "exam_date_${packageName.replace('.', '_')}"
         val rawDate = remoteConfigRepo.getString(examDateKey)
         if (rawDate.length == 8) {
             try {
-                // YYYYMMDD をパース
                 val sdf = SimpleDateFormat("yyyyMMdd", Locale.US)
                 val date = sdf.parse(rawDate)
                 if (date != null) {
-                    // 1. フォーマット済み日付
                     val formatted = SimpleDateFormat("yyyy年MM月dd日（E）", Locale.JAPANESE).format(date)
                     info["exam_date"] = formatted
-
-                    // 2. 残り日数の計算
                     val today = Calendar.getInstance().apply {
                         set(Calendar.HOUR_OF_DAY, 0)
                         set(Calendar.MINUTE, 0)
@@ -115,11 +102,8 @@ class HomeViewModel @Inject constructor(
                         info["remaining_days"] = days
                     }
                 }
-            } catch (e: Exception) {
-                // 解析失敗時は表示しない
-            }
+            } catch (e: Exception) {}
         }
-
         _appSpecificInfo.value = info
     }
 
@@ -144,11 +128,10 @@ class HomeViewModel @Inject constructor(
         val examDateText: String? = null,
         val remainingDays: Int? = null,
         val streakDays: Int = 0,
-        val scoreStatus: PredictedScoreStatus = PredictedScoreStatus.NOT_ATTEMPTED
+        val scoreStatus: PredictedScoreStatus = PredictedScoreStatus.NOT_ATTEMPTED,
+        val weakestCategoryName: String? = null // 追加
     )
 
-    // Flowを結合してUiStateを作成
-    // combine の多引数制限と型推論の問題を避けるため、入れ子にして結合
     val uiState: StateFlow<HomeUiState> = combine(
         combine(quotaFlow, isPremium, reminderRepo.isReminderEnabled) { q, p, r -> Triple(q, p, r) },
         combine(_isReminderInvitationDismissed, _appSpecificInfo, analysisFlow) { d, i, a -> Triple(d, i, a) }
@@ -159,12 +142,18 @@ class HomeViewModel @Inject constructor(
         if (quota == null) {
             HomeUiState(isLoading = true)
         } else {
-            // 推定スコアのステータス判定
             val status = when {
                 analysis == null || analysis.totalProgress == 0f -> PredictedScoreStatus.NOT_ATTEMPTED
                 analysis.predictedScore >= (analysis.totalExamQuestions * appAssetConfig.passingScoreThreshold) -> PredictedScoreStatus.PASSING
                 else -> PredictedScoreStatus.BELOW_PASSING
             }
+
+            // 苦手カテゴリーの抽出 (正解率が100%未満かつ最小のもの)
+            val weakest = analysis?.categorySummaries
+                ?.filter { it.solvedCount > 0 }
+                ?.minByOrNull { it.accuracyRate }
+                ?.takeIf { it.accuracyRate < 0.9f } // ある程度正解率が低い場合のみ表示
+                ?.categoryName
 
             HomeUiState(
                 canStart = quota.canStart,
@@ -173,7 +162,8 @@ class HomeViewModel @Inject constructor(
                 examDateText = appInfo["exam_date"] as? String,
                 remainingDays = appInfo["remaining_days"] as? Int,
                 streakDays = analysis?.currentStreak ?: 0,
-                scoreStatus = status
+                scoreStatus = status,
+                weakestCategoryName = weakest
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
@@ -204,9 +194,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 学習分析ボタンがクリックされた時の処理。
-     */
     fun onAnalysisClicked() {
         viewModelScope.launch {
             if (uiState.value.isPremium) {
@@ -223,7 +210,6 @@ class HomeViewModel @Inject constructor(
                 _event.emit(HomeEvent.RequestShowPaywall)
                 return@launch
             }
-
             settingsProvider.updateWeaknessMode(true)
             _event.emit(HomeEvent.RequestNavigateToSettings)
         }

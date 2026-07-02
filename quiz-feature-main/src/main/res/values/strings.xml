@@ -15,7 +15,11 @@
     <string name="home_score_not_attempted">未実施</string>
     <string name="home_score_below_passing">合格ラインまであと一歩</string>
     <string name="home_score_passing">合格ライン到達！</string>
-    <string name="home_score_detail_note">※詳細は「学習分析」画面で確認できます</string>
+    <string name="home_score_detail_note">※タップして「学習分析」で詳細を確認できます</string>
+
+    <!-- New Card for Weakness Pickup -->
+    <string name="home_weakness_pickup_title">重点学習のすすめ</string>
+    <string name="home_weakness_pickup_message">「%1$s」の正解率が低めです。\n弱点特訓で克服しましょう！</string>
 
     <!-- Quiz -->
     <string name="quiz_question_format">第 %1$d 問 / 全 %2$d 問</string>
