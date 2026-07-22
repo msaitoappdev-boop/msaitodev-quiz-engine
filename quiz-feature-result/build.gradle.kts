@@ -6,12 +6,13 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("maven-publish")
 }
 
 android {
     namespace = "com.msaitodev.quiz.feature.result"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -39,9 +40,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
-    }
 
     publishing {
         singleVariant("release") {
@@ -56,7 +54,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-feature-result"
-                version = "1.0.0"
+                version = "1.0.1"
                 from(components["release"])
             }
         }
@@ -65,15 +63,15 @@ afterEvaluate {
 
 dependencies {
     // 全てのコアライブラリを Maven 形式で参照
-    implementation("com.msaitodev.core:core-common:1.0.0")
-    implementation("com.msaitodev.core:core-ads:1.0.0")
-    implementation("com.msaitodev.core:core-notifications:1.0.0")
-    implementation("com.msaitodev.core:core-navigation:1.0.0")
-    implementation("com.msaitodev.core:core-cloud-sync:1.0.0")
-    implementation("com.msaitodev.feature:feature-billing:1.0.0")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.0.0")
-    implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.0")
-    implementation("com.msaitodev.quiz:quiz-core-data:1.0.0")
+    implementation("com.msaitodev.core:core-common:1.0.1")
+    implementation("com.msaitodev.core:core-ads:1.0.3")
+    implementation("com.msaitodev.core:core-notifications:1.0.2")
+    implementation("com.msaitodev.core:core-navigation:1.0.1")
+    implementation("com.msaitodev.core:core-cloud-sync:1.1.2")
+    implementation("com.msaitodev.feature:feature-billing:1.0.2")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.2")
+    implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.1")
+    implementation("com.msaitodev.quiz:quiz-core-data:1.1.2")
 
     // Compose
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
@@ -85,7 +83,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.4")
 
     // Hilt (KSP)
-    val hiltVersion = "2.51.1"
+    val hiltVersion = "2.55"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     ksp("com.google.dagger:hilt-compiler:$hiltVersion")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")

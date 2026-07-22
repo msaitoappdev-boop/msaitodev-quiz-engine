@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.msaitodev.quiz.core.navigation"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -47,7 +47,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-core-navigation"
-                version = "1.0.0"
+                version = "1.0.1"
                 from(components["release"])
             }
         }
@@ -56,7 +56,7 @@ afterEvaluate {
 
 dependencies {
     // 汎用ナビゲーションを Maven 形式へ差し替え
-    implementation("com.msaitodev.core:core-navigation:1.0.0")
+    implementation("com.msaitodev.core:core-navigation:1.0.1")
 
     implementation("androidx.navigation:navigation-compose:2.8.4")
     implementation("androidx.core:core-ktx:1.13.1")

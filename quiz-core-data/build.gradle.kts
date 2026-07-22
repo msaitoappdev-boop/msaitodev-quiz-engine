@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.msaitodev.quiz.core.data"
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         minSdk = 24
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -46,7 +46,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-core-data"
-                version = "1.1.1"
+                version = "1.1.2"
                 from(components["release"])
             }
         }
@@ -61,12 +61,12 @@ ksp {
 
 dependencies {
     // 汎用・ドメインコアをすべて Maven 形式へ
-    implementation("com.msaitodev.core:core-common:1.0.0")
-    implementation("com.msaitodev.core:core-cloud-sync:1.1.1")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.1")
+    implementation("com.msaitodev.core:core-common:1.0.1")
+    implementation("com.msaitodev.core:core-cloud-sync:1.1.2")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.2")
 
     // Billing
-    implementation("com.android.billingclient:billing-ktx:7.1.1")
+    implementation("com.android.billingclient:billing-ktx:8.0.0")
 
     val room = "2.6.1"
     implementation("androidx.room:room-runtime:${room}")
@@ -74,7 +74,7 @@ dependencies {
     ksp("androidx.room:room-compiler:$room")
 
     // Hilt
-    val hiltVersion = "2.51.1"
+    val hiltVersion = "2.55"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     ksp("com.google.dagger:hilt-compiler:$hiltVersion")
 

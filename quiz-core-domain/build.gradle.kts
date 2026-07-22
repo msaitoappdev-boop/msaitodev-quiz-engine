@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.msaitodev.quiz.core.domain"
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         minSdk = 24
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -46,7 +46,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-core-domain"
-                version = "1.1.1"
+                version = "1.1.2"
                 from(components["release"])
             }
         }
@@ -55,11 +55,11 @@ afterEvaluate {
 
 dependencies {
     // 汎用コアを Maven 形式へ
-    implementation("com.msaitodev.core:core-ads:1.0.0")
-    implementation("com.msaitodev.core:core-common:1.0.0")
+    implementation("com.msaitodev.core:core-ads:1.0.3")
+    implementation("com.msaitodev.core:core-common:1.0.1")
 
     // Hilt (KSP)
-    val hiltVersion = "2.51.1"
+    val hiltVersion = "2.55"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     ksp("com.google.dagger:hilt-compiler:$hiltVersion")
 

@@ -5,12 +5,13 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("maven-publish")
 }
 
 android {
     namespace = "com.msaitodev.quiz.feature.history"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -37,9 +38,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
-    }
 
     publishing {
         singleVariant("release") {
@@ -54,7 +52,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-feature-history"
-                version = "1.0.0"
+                version = "1.0.1"
                 from(components["release"])
             }
         }
@@ -63,10 +61,10 @@ afterEvaluate {
 
 dependencies {
     // 全てのコアライブラリを Maven 形式で参照
-    implementation("com.msaitodev.core:core-common:1.0.0")
-    implementation("com.msaitodev.core:core-navigation:1.0.0")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.0.0")
-    implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.0")
+    implementation("com.msaitodev.core:core-common:1.0.1")
+    implementation("com.msaitodev.core:core-navigation:1.0.1")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.2")
+    implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.1")
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
@@ -83,7 +81,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.4")
 
     // Hilt (KSP)
-    val hiltVersion = "2.51.1"
+    val hiltVersion = "2.55"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     ksp("com.google.dagger:hilt-compiler:$hiltVersion")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
