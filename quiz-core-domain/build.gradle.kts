@@ -46,7 +46,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-core-domain"
-                version = "1.1.2"
+                version = "1.2.0"
                 from(components["release"])
             }
         }
@@ -55,8 +55,8 @@ afterEvaluate {
 
 dependencies {
     // 汎用コアを Maven 形式へ
-    implementation("com.msaitodev.core:core-ads:1.0.3")
-    implementation("com.msaitodev.core:core-common:1.0.1")
+    implementation("com.msaitodev.core:core-ads:1.1.0")
+    implementation("com.msaitodev.core:core-common:1.1.0")
 
     // Hilt (KSP)
     val hiltVersion = "2.55"

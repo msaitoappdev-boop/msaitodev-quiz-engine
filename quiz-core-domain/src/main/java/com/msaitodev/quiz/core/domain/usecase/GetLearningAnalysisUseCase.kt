@@ -154,7 +154,10 @@ class GetLearningAnalysisUseCase @Inject constructor(
         }
         val keyFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
 
-        val grouped = history.groupBy { entry ->
+        // 履歴を古い順にソートしてからグループ化する
+        val sortedHistory = history.sortedBy { it.timestamp }
+
+        val grouped = sortedHistory.groupBy { entry ->
             val cal = Calendar.getInstance().apply { timeInMillis = entry.timestamp }
             when (period) {
                 TrendPeriod.DAILY -> dateFormat.format(Date(entry.timestamp))

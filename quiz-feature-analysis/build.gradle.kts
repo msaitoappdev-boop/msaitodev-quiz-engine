@@ -53,7 +53,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-feature-analysis"
-                version = "1.0.2"
+                version = "1.1.0"
                 from(components["release"])
             }
         }
@@ -62,9 +62,9 @@ afterEvaluate {
 
 dependencies {
     // 全てのコア・フィーチャーライブラリを Maven 形式で参照
-    implementation("com.msaitodev.core:core-common:1.0.1")
-    implementation("com.msaitodev.feature:feature-settings:1.0.1")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.2")
+    implementation("com.msaitodev.core:core-common:1.1.0")
+    implementation("com.msaitodev.feature:feature-settings:1.1.0")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.2.0")
     implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.1")
 
     // AndroidX / Compose

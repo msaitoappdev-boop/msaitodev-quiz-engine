@@ -54,7 +54,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-feature-review"
-                version = "1.0.1"
+                version = "1.1.0"
                 from(components["release"])
             }
         }
@@ -63,11 +63,11 @@ afterEvaluate {
 
 dependencies {
     // 全てのコアライブラリを Maven 形式で参照
-    implementation("com.msaitodev.core:core-common:1.0.1")
+    implementation("com.msaitodev.core:core-common:1.1.0")
     implementation("com.msaitodev.core:core-navigation:1.0.1")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.2")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.2.0")
     implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.1")
-    implementation("com.msaitodev.quiz:quiz-core-data:1.1.2")
+    implementation("com.msaitodev.quiz:quiz-core-data:1.2.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 

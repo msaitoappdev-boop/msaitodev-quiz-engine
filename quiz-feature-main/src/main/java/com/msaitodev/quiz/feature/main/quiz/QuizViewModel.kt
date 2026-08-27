@@ -2,6 +2,7 @@ package com.msaitodev.quiz.feature.main.quiz
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msaitodev.core.common.billing.PremiumPlan
 import com.msaitodev.core.common.navigation.AppActions
 import com.msaitodev.feature.settings.SettingsProvider
 import com.msaitodev.quiz.core.domain.config.RemoteConfigKeys
@@ -57,10 +58,10 @@ class QuizViewModel @Inject constructor(
 
     val uiState: StateFlow<QuizUiState> = combine(
         _internalState, 
-        premiumRepository.isPremium,
+        premiumRepository.premiumPlan,
         settingsProvider.isWeaknessMode,
         settingsProvider.weaknessCategoryName
-    ) { internalState, isPremium, isWeaknessMode, categoryName ->
+    ) { internalState, plan, isWeaknessMode, categoryName ->
         val mode = when {
             isReviewSession -> QuizMode.Review
             isWeaknessMode -> {
@@ -86,7 +87,7 @@ class QuizViewModel @Inject constructor(
             selectedIndex = internalState.answers.getOrNull(internalState.currentIndex),
             isAnswered = internalState.answers.getOrNull(internalState.currentIndex) != null,
             correctCount = calcScore(internalState.questions, internalState.answers),
-            canShowFullExplanation = isPremium,
+            canShowFullExplanation = plan != PremiumPlan.NONE,
             mode = mode
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), QuizUiState())

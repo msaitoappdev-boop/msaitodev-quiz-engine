@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msaitodev.core.ads.RewardedHelper
+import com.msaitodev.core.common.billing.PremiumPlan
 import com.msaitodev.core.common.config.AppAssetConfig
 import com.msaitodev.core.notifications.ReminderRepository
 import com.msaitodev.feature.settings.SettingsProvider
@@ -63,7 +64,7 @@ class HomeViewModel @Inject constructor(
     private val appAssetConfig: AppAssetConfig
 ) : ViewModel() {
 
-    private val isPremium: StateFlow<Boolean> = premiumRepo.isPremium
+    private val premiumPlan: StateFlow<PremiumPlan> = premiumRepo.premiumPlan
     private val _isReminderInvitationDismissed = MutableStateFlow(false)
     private val _appSpecificInfo = MutableStateFlow<Map<String, Any>>(emptyMap())
 
@@ -108,9 +109,13 @@ class HomeViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val quotaFlow: StateFlow<QuotaState?> = isPremium.flatMapLatest { isPremiumValue ->
-        val limitKey = if (isPremiumValue) RemoteConfigKeys.PREMIUM_DAILY_SETS else RemoteConfigKeys.FREE_DAILY_SETS
-        val limit = remoteConfigRepo.getLong(limitKey).toInt()
+    private val quotaFlow: StateFlow<QuotaState?> = premiumPlan.flatMapLatest { plan ->
+        val limitKey = when (plan) {
+            PremiumPlan.LIFETIME -> RemoteConfigKeys.PREMIUM_DAILY_SETS
+            PremiumPlan.MONTHLY -> RemoteConfigKeys.PREMIUM_DAILY_SETS
+            PremiumPlan.NONE -> RemoteConfigKeys.FREE_DAILY_SETS
+        }
+        val limit = if (plan == PremiumPlan.LIFETIME) Int.MAX_VALUE else remoteConfigRepo.getLong(limitKey).toInt()
         quotaRepo.observe { limit }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
@@ -124,19 +129,20 @@ class HomeViewModel @Inject constructor(
         val canStart: Boolean = false,
         val isLoading: Boolean = false,
         val isPremium: Boolean = false,
+        val premiumPlan: PremiumPlan = PremiumPlan.NONE,
         val showReminderInvitation: Boolean = false,
         val examDateText: String? = null,
         val remainingDays: Int? = null,
         val streakDays: Int = 0,
         val scoreStatus: PredictedScoreStatus = PredictedScoreStatus.NOT_ATTEMPTED,
-        val weakestCategoryName: String? = null // 追加
+        val weakestCategoryName: String? = null
     )
 
     val uiState: StateFlow<HomeUiState> = combine(
-        combine(quotaFlow, isPremium, reminderRepo.isReminderEnabled) { q, p, r -> Triple(q, p, r) },
+        combine(quotaFlow, premiumPlan, reminderRepo.isReminderEnabled) { q, p, r -> Triple(q, p, r) },
         combine(_isReminderInvitationDismissed, _appSpecificInfo, analysisFlow) { d, i, a -> Triple(d, i, a) }
     ) { t1, t2 ->
-        val (quota, isPremiumValue, isReminderEnabled) = t1
+        val (quota, plan, isReminderEnabled) = t1
         val (isDismissed, appInfo, analysis) = t2
 
         if (quota == null) {
@@ -157,7 +163,8 @@ class HomeViewModel @Inject constructor(
 
             HomeUiState(
                 canStart = quota.canStart,
-                isPremium = isPremiumValue,
+                isPremium = plan != PremiumPlan.NONE,
+                premiumPlan = plan,
                 showReminderInvitation = !isReminderEnabled && !isDismissed,
                 examDateText = appInfo["exam_date"] as? String,
                 remainingDays = appInfo["remaining_days"] as? Int,

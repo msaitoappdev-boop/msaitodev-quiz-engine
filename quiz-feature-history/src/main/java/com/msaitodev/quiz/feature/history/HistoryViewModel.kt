@@ -1,6 +1,7 @@
 package com.msaitodev.quiz.feature.history
 
 import androidx.lifecycle.ViewModel
+import com.msaitodev.core.common.billing.PremiumPlan
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.msaitodev.quiz.core.domain.model.ScoreEntry
 import com.msaitodev.quiz.core.domain.repository.PremiumRepository
@@ -26,12 +27,12 @@ class HistoryViewModel @Inject constructor(
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     val history: Flow<List<ScoreEntry>> = combine(
-        premiumRepo.isPremium,
+        premiumRepo.premiumPlan,
         _dateFilter
-    ) { isPremium, dateKey ->
-        isPremium to dateKey
-    }.flatMapLatest { (isPremium, dateKey) ->
-        if (isPremium) {
+    ) { plan, dateKey ->
+        plan to dateKey
+    }.flatMapLatest { (plan, dateKey) ->
+        if (plan != PremiumPlan.NONE) {
             observeScores(dateKey)
         } else {
             observeScores(null)
