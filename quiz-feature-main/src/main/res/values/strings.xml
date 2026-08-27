@@ -65,9 +65,9 @@
     <!-- プレミアムプラン（月額） -->
     <string name="paywall_monthly_plan_title">プレミアムプラン\n（月額）</string>
     <string name="paywall_monthly_plan_price">月額 ¥200</string>
-    <string name="paywall_monthly_purchase_button_text">¥200/月 でプレミアムプラン（月額）に加入</string>
-    <string name="paywall_monthly_purchase_button_purchased">加入済みです</string>
-    <string name="paywall_monthly_purchase_dialog_description">1ヶ月ごとに自動更新されます。\nいつでも解約可能です。</string>
+    <string name="paywall_monthly_purchase_button_text">¥200 でプレミアムプラン（月額）を購入</string>
+    <string name="paywall_monthly_purchase_button_purchased">購入済みです</string>
+    <string name="paywall_monthly_purchase_dialog_description">購入日から1ヶ月間（30日間）有効です。\nいつでも解約可能です。\nGoogle Play の購入ダイアログが表示されます。</string>
     <string name="paywall_monthly_benefits">・広告を非表示\n・1日の挑戦セット数を10セットに拡張\n・解説を全文表示\n・学習分析機能を解放</string>
 
     <!-- プレミアムプラン（無制限） -->
@@ -75,7 +75,7 @@
     <string name="paywall_lifetime_plan_price">一括 ¥1,480</string>
     <string name="paywall_lifetime_purchase_button_text">¥1,480 でプレミアムプラン（無制限）を購入</string>
     <string name="paywall_lifetime_purchase_button_purchased">購入済みです</string>
-    <string name="paywall_lifetime_purchase_dialog_description">一度の購入で無期限にご利用いただけます。\n1日の挑戦制限もなくなります。</string>
+    <string name="paywall_lifetime_purchase_dialog_description">一度の購入で無期限にご利用いただけます。\n1日の挑戦制限もなくなります。\nGoogle Play の購入ダイアログが表示されます。</string>
     <string name="paywall_lifetime_benefits">・広告を非表示\n・1日の挑戦セット数が無制限\n・解説を全文表示\n・学習分析機能を解放</string>
 
     <!-- Billing Error Messages (Provided to Core) -->
