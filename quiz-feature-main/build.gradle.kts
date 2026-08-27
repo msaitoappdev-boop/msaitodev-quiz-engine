@@ -53,7 +53,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-feature-main"
-                version = "1.1.1"
+                version = "1.2.0"
                 from(components["release"])
             }
         }
@@ -62,13 +62,13 @@ afterEvaluate {
 
 dependencies {
     // 全てのコアライブラリを Maven 形式で参照
-    implementation("com.msaitodev.core:core-common:1.0.1")
-    implementation("com.msaitodev.core:core-ads:1.0.3")
-    implementation("com.msaitodev.core:core-notifications:1.0.2")
+    implementation("com.msaitodev.core:core-common:1.1.0")
+    implementation("com.msaitodev.core:core-ads:1.1.0")
+    implementation("com.msaitodev.core:core-notifications:1.1.0")
     implementation("com.msaitodev.core:core-navigation:1.0.1")
-    implementation("com.msaitodev.core:core-cloud-sync:1.1.2")
-    implementation("com.msaitodev.feature:feature-settings:1.0.1")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.2")
+    implementation("com.msaitodev.core:core-cloud-sync:1.2.0")
+    implementation("com.msaitodev.feature:feature-settings:1.1.0")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.2.0")
     implementation("com.msaitodev.quiz:quiz-core-navigation:1.0.1")
 
     implementation("androidx.core:core-ktx:1.13.1")

@@ -46,7 +46,7 @@ afterEvaluate {
             register<MavenPublication>("release") {
                 groupId = "com.msaitodev.quiz"
                 artifactId = "quiz-core-data"
-                version = "1.1.2"
+                version = "1.2.0"
                 from(components["release"])
             }
         }
@@ -61,9 +61,9 @@ ksp {
 
 dependencies {
     // 汎用・ドメインコアをすべて Maven 形式へ
-    implementation("com.msaitodev.core:core-common:1.0.1")
-    implementation("com.msaitodev.core:core-cloud-sync:1.1.2")
-    implementation("com.msaitodev.quiz:quiz-core-domain:1.1.2")
+    implementation("com.msaitodev.core:core-common:1.1.0")
+    implementation("com.msaitodev.core:core-cloud-sync:1.2.0")
+    implementation("com.msaitodev.quiz:quiz-core-domain:1.2.0")
 
     // Billing
     implementation("com.android.billingclient:billing-ktx:8.0.0")

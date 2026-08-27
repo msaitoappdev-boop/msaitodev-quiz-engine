@@ -1,6 +1,7 @@
 package com.msaitodev.quiz.core.data.repository
 
 import com.msaitodev.core.cloudsync.CloudSyncClient
+import com.msaitodev.core.common.billing.PremiumPlan
 import com.msaitodev.quiz.core.domain.model.QuestionStats
 import com.msaitodev.quiz.core.domain.model.ScoreEntry
 import com.msaitodev.quiz.core.domain.repository.PremiumRepository
@@ -24,7 +25,8 @@ class SyncRepositoryImpl @Inject constructor(
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun uploadToCloud(): Boolean {
-        if (!premiumRepository.isPremium.value) return false
+        val plan = premiumRepository.premiumPlan.value
+        if (plan == PremiumPlan.NONE) return false
 
         return try {
             val stats = wrongAnswerRepository.allStats.first()
@@ -46,7 +48,8 @@ class SyncRepositoryImpl @Inject constructor(
     }
 
     override suspend fun downloadFromCloud(): Boolean {
-        if (!premiumRepository.isPremium.value) return false
+        val plan = premiumRepository.premiumPlan.value
+        if (plan == PremiumPlan.NONE) return false
 
         return try {
             val cloudData = cloudSyncClient.download("quiz_sync", "latest") ?: return false

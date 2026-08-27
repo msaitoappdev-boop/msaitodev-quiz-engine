@@ -3,6 +3,7 @@ package com.msaitodev.quiz.feature.review
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.msaitodev.core.common.billing.PremiumPlan
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.msaitodev.quiz.core.domain.model.Question
@@ -32,7 +33,7 @@ class ReviewViewModel @Inject constructor(
             val questions = Json.decodeFromString<List<Question>>(questionsJson)
             val answers = Json.decodeFromString<List<Int?>>(answersJson)
 
-            premiumRepository.isPremium.collect { isPremium ->
+            premiumRepository.premiumPlan.collect { plan ->
                 val items = questions.mapIndexed { index, question ->
                     ReviewItem(
                         number = index + 1,
@@ -40,7 +41,7 @@ class ReviewViewModel @Inject constructor(
                         options = question.options,
                         selectedIndex = answers.getOrNull(index),
                         correctIndex = question.correctIndex,
-                        explanation = if (isPremium) question.explanation else null
+                        explanation = if (plan != PremiumPlan.NONE) question.explanation else null
                     )
                 }
                 _uiState.value = ReviewUiState(items = items, isLoading = false)

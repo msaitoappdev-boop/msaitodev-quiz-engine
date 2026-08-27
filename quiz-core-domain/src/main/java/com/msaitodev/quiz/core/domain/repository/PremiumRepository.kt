@@ -1,10 +1,10 @@
 package com.msaitodev.quiz.core.domain.repository
 
+import com.msaitodev.core.common.billing.PremiumPlan
 import kotlinx.coroutines.flow.StateFlow
 
 interface PremiumRepository {
-    val isPremium: StateFlow<Boolean>
+    val premiumPlan: StateFlow<PremiumPlan>
     suspend fun refreshFromBilling()
-    suspend fun savePremiumStatus(isPremium: Boolean)
-    suspend fun setPremiumForDebug(enabled: Boolean)
+    suspend fun setPremiumForDebug(plan: PremiumPlan)
 }

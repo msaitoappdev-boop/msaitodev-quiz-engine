@@ -1,6 +1,7 @@
 package com.msaitodev.quiz.core.domain.usecase
 
 import com.msaitodev.core.ads.RewardedHelper
+import com.msaitodev.core.common.billing.PremiumPlan
 import com.msaitodev.quiz.core.domain.config.RemoteConfigKeys
 import com.msaitodev.quiz.core.domain.repository.PremiumRepository
 import com.msaitodev.quiz.core.domain.repository.RemoteConfigRepository
@@ -19,9 +20,13 @@ class StartNextQuizUseCase @Inject constructor(
     private val remoteConfigRepo: RemoteConfigRepository,
 ) {
     suspend operator fun invoke(): Result {
-        val isPremium = premiumRepo.isPremium.first()
-        val limitKey = if (isPremium) RemoteConfigKeys.PREMIUM_DAILY_SETS else RemoteConfigKeys.FREE_DAILY_SETS
-        val limit = remoteConfigRepo.getLong(limitKey).toInt()
+        val plan = premiumRepo.premiumPlan.first()
+        
+        val limit = when (plan) {
+            PremiumPlan.LIFETIME -> Int.MAX_VALUE
+            PremiumPlan.MONTHLY -> remoteConfigRepo.getLong(RemoteConfigKeys.PREMIUM_DAILY_SETS).toInt()
+            PremiumPlan.NONE -> remoteConfigRepo.getLong(RemoteConfigKeys.FREE_DAILY_SETS).toInt()
+        }
         
         // 学習セットの消化状況を取得
         val currentQuota = quotaRepo.observe { limit }.first()
@@ -32,7 +37,7 @@ class StartNextQuizUseCase @Inject constructor(
             Result.CanStart
         } else {
             // 上限に達している場合
-            if (isPremium) {
+            if (plan != PremiumPlan.NONE) {
                 Result.QuotaExceeded
             } else {
                 // 無料ユーザーの場合、リワード視聴が可能であればオファーを出す

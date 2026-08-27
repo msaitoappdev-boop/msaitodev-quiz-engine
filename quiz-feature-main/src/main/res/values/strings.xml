@@ -31,7 +31,7 @@
     <string name="quiz_tap_option">選択肢をタップしてください</string>
     <string name="quiz_explanation_premium">解説の全文はプレミアムで解放されます。</string>
     <string name="quiz_explanation_label">解説：%1$s</string>
-    <string name="quiz_upgrade_button">月額 ¥200 で解説を解放</string>
+    <string name="quiz_upgrade_button">プランを選択して解説を解放</string>
     <string name="quiz_prev">前の問題へ</string>
     <string name="quiz_next">次へ</string>
     <string name="quiz_show_result">結果を見る</string>
@@ -57,4 +57,31 @@
     <string name="home_reminder_invitation_message">通知を設定すると、毎日の学習を忘れずに続けられます。合格率アップへの近道です！</string>
     <string name="home_reminder_invitation_action">通知を設定する</string>
     <string name="home_reminder_invitation_dismiss">今はしない</string>
+
+    <!-- Paywall 共通 -->
+    <string name="paywall_title">プレミアムプラン</string>
+    <string name="paywall_headline">すべての機能を解放して効率的に学習</string>
+
+    <!-- プレミアムプラン（月額） -->
+    <string name="paywall_monthly_plan_title">プレミアムプラン\n（月額）</string>
+    <string name="paywall_monthly_plan_price">月額 ¥200</string>
+    <string name="paywall_monthly_purchase_button_text">¥200/月 でプレミアムプラン（月額）に加入</string>
+    <string name="paywall_monthly_purchase_button_purchased">加入済みです</string>
+    <string name="paywall_monthly_purchase_dialog_description">1ヶ月ごとに自動更新されます。\nいつでも解約可能です。</string>
+    <string name="paywall_monthly_benefits">・広告を非表示\n・1日の挑戦セット数を10セットに拡張\n・解説を全文表示\n・学習分析機能を解放</string>
+
+    <!-- プレミアムプラン（無制限） -->
+    <string name="paywall_lifetime_plan_title">プレミアムプラン\n（無制限）</string>
+    <string name="paywall_lifetime_plan_price">一括 ¥1,480</string>
+    <string name="paywall_lifetime_purchase_button_text">¥1,480 でプレミアムプラン（無制限）を購入</string>
+    <string name="paywall_lifetime_purchase_button_purchased">購入済みです</string>
+    <string name="paywall_lifetime_purchase_dialog_description">一度の購入で無期限にご利用いただけます。\n1日の挑戦制限もなくなります。</string>
+    <string name="paywall_lifetime_benefits">・広告を非表示\n・1日の挑戦セット数が無制限\n・解説を全文表示\n・学習分析機能を解放</string>
+
+    <!-- Billing Error Messages (Provided to Core) -->
+    <string name="billing_error_offer_not_found">購入オファーが見つかりません</string>
+    <string name="billing_error_acknowledge_failed">承認に失敗しました</string>
+    <string name="billing_error_pending">お支払い処理中です。完了後に自動で有効化されます。</string>
+    <string name="billing_error_general">購入エラーが発生しました</string>
+
 </resources>
